@@ -1,0 +1,18 @@
+{
+  "type": "module",
+  "name": "thispersondoesnotexist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Jorre",
+  "license": "ISC",
+  "dependencies": {
+    "@tensorflow/tfjs-node": "4.11.0",
+    "@vladmandic/face-api": "1.7.12",
+    "canvas": "2.11.2",
+    "node-fetch": "3.3.2"
+  }
+}
