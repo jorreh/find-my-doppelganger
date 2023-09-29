@@ -13,6 +13,7 @@
     "@tensorflow/tfjs-node": "4.11.0",
     "@vladmandic/face-api": "1.7.12",
     "canvas": "2.11.2",
+    "fs-extra": "11.1.1",
     "node-fetch": "3.3.2"
   }
 }
