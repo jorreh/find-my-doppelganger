@@ -9,7 +9,8 @@ import * as faceapi from "@vladmandic/face-api";
 
 import fetch from "node-fetch";
 
-const fs = require("fs-extra");
+import fs from "fs";
+import fse from "fs-extra/esm";
 
 const MODEL_URL = "assets/models"; //model directory
 
