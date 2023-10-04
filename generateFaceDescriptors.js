@@ -35,7 +35,7 @@ async function init() {
 
   labels = getFaceImgListFromDisk(facesPath);
 
-  let faceApiDescriptors = await generatefaceDescriptors();
+  let faceApiDescriptors = await getlabeledFaceDescriptors();
   writeLabeledFaceDescriptorsToJson(faceApiDescriptors);
 
   console.timeEnd("generateTime");
@@ -110,11 +110,6 @@ async function getlabeledFaceDescriptors() {
 
 function writeLabeledFaceDescriptorsToJson(labeledFaceDescriptors) {
   writeJson(labeledFaceDescriptors, faceDescriptorsWritePath, "faceDescriptors");
-}
-
-async function generatefaceDescriptors() {
-  let labeledFaceDescriptors = await getlabeledFaceDescriptors();
-  return labeledFaceDescriptors;
 }
 
 function writeJson(json, jsonWritePath, fileName) {
