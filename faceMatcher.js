@@ -16,16 +16,11 @@ const MODEL_URL = "assets/models"; //model directory
 // Make face-api.js use that fetch implementation
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ fetch: fetch, Canvas, Image, ImageData });
-const facesUrl = "http://127.0.0.1:5500/faces";
-const testFacesUrl = "http://127.0.0.1:5500/faces_test";
 
-const faceDescriptorsWritePath = "assets/faceDescriptors";
-
+const testFacesPath = "assets/faces_test";
 const testFaceName = "Jorre.jpg";
 
-let testFace;
-
-const labels = [];
+const faceDescriptorsWritePath = "assets/faceDescriptors";
 
 async function init() {
   console.time("findMatchTime");
@@ -51,7 +46,7 @@ async function loadFaceApiModels() {
 }
 
 async function getTestFaceDescriptions() {
-  let testFace = await canvas.loadImage(`${testFacesUrl}/${testFaceName}`); // todo - load from disk
+  let testFace = await canvas.loadImage(`${testFacesPath}/${testFaceName}`);
 
   let testFaceDescriptions = await faceapi
     .detectAllFaces(testFace)

@@ -19,7 +19,8 @@ const MODEL_URL = "assets/models"; //model directory
 // Make face-api.js use that fetch implementation
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ fetch: fetch, Canvas, Image, ImageData });
-const facesUrl = "http://127.0.0.1:5500/faces";
+
+// const facesUrl = "http://127.0.0.1:5500/faces";
 
 const faceDescriptorsWritePath = "assets/faceDescriptors";
 const facesPath = "assets/faces";
@@ -31,9 +32,9 @@ async function init() {
 
   await loadFaceApiModels();
 
-  // fillLables();
-
   labels = getFaceImgListFromDisk(facesPath);
+
+  // labels = labels.slice(1, 3); // tmp test with a slice of array
 
   let faceApiDescriptors = await getlabeledFaceDescriptors();
   writeLabeledFaceDescriptorsToJson(faceApiDescriptors);
@@ -79,8 +80,9 @@ function getFaceImgListFromDisk(facesPath) {
 async function getlabeledFaceDescriptors() {
   const labeledFaceDescriptors = await Promise.all(
     labels.map(async (label) => {
-      // const imgUrl = `images/${label}.jpeg`;
-      const imgUrl = `${facesUrl}/${label}.jpg`;
+      //const imgUrl = `${facesUrl}/${label}.jpg`;
+      const imgUrl = `${facesPath}/${label}.jpg`;
+
       // const img = await faceapi.fetchImage(imgUrl);
       const img = await canvas.loadImage(imgUrl);
 
