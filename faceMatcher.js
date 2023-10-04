@@ -34,11 +34,6 @@ async function init() {
 
   let faceApiDescriptors = getfaceDescriptorsFromJson();
 
-  //   fillLables();
-  //   let faceApiDescriptors = await generatefaceDescriptors();
-  //   console.log(faceApiDescriptors[0]);
-  //   writeLabeledFaceDescriptorsToJson(faceApiDescriptors);
-
   let lookalikeResult = findLookalike(testFaceDescriptions, faceApiDescriptors);
   console.log(lookalikeResult);
 }
@@ -64,61 +59,6 @@ async function getTestFaceDescriptions() {
   testFaceDescriptions = faceapi.resizeResults(testFaceDescriptions, testFace);
 
   return testFaceDescriptions;
-}
-
-function fillLables() {
-  // todo loop through /faces dir and make list that way
-  for (let i = 1; i <= 101; i++) {
-    // todo -> change I terug naar 101
-    labels.push(`face${i}`);
-  }
-}
-
-//const detections = await faceapi.detectAllFaces(img);
-// console.log(detections);
-
-// let labeledFaceDescriptors = fs.readJsonSync(`${faceDescriptorsWritePath}/faceDescriptors.json`);
-// console.log(labeledFaceDescriptors);
-
-async function getlabeledFaceDescriptors() {
-  const labeledFaceDescriptors = await Promise.all(
-    labels.map(async (label) => {
-      // const imgUrl = `images/${label}.jpeg`;
-      const imgUrl = `${facesUrl}/${label}.jpg`;
-      // const img = await faceapi.fetchImage(imgUrl);
-      const img = await canvas.loadImage(imgUrl);
-
-      const faceDescription = await faceapi
-        .detectSingleFace(img)
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-
-      if (!faceDescription) {
-        throw new Error(`no faces detected for ${label}`);
-      }
-
-      let descriptorAsRegularArray = Array.from(faceDescription.descriptor);
-
-      const faceDescriptors = [descriptorAsRegularArray];
-
-      return {
-        label: label,
-        descriptors: faceDescriptors,
-      };
-      //return new faceapi.LabeledFaceDescriptors(label, faceDescriptors);
-    })
-  );
-
-  return labeledFaceDescriptors;
-}
-
-function writeLabeledFaceDescriptorsToJson(labeledFaceDescriptors) {
-  writeJson(labeledFaceDescriptors, faceDescriptorsWritePath, "faceDescriptors");
-}
-
-async function generatefaceDescriptors() {
-  let labeledFaceDescriptors = await getlabeledFaceDescriptors();
-  return labeledFaceDescriptors;
 }
 
 function loadLabeledFaceDescriptorsFromDisk() {
@@ -180,11 +120,7 @@ function findLookalike(testFaceDescriptions, faceApiDescriptors) {
 }
 
 function writeJson(json, jsonWritePath, fileName) {
-  // console.log(json);
   let data = JSON.stringify(json, null, 4);
-
-  // console.log(data);
-
   fs.writeFileSync(jsonWritePath + "/" + fileName + ".json", data, "utf-8");
 }
 

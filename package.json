@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "generate": "node generateFaceDescriptors.js",
+    "findMatch": "node faceMatcher.js"
   },
   "author": "Jorre",
   "license": "ISC",
