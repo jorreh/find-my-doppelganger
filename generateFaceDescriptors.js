@@ -23,12 +23,15 @@ const faceDescriptorsWritePath = "assets/faceDescriptors";
 const labels = [];
 
 async function init() {
+  console.time("generateTime");
+
   await loadFaceApiModels();
 
   fillLables();
   let faceApiDescriptors = await generatefaceDescriptors();
-  console.log(faceApiDescriptors[0]);
   writeLabeledFaceDescriptorsToJson(faceApiDescriptors);
+
+  console.timeEnd("generateTime");
 }
 
 async function loadFaceApiModels() {

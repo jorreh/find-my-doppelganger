@@ -28,6 +28,8 @@ let testFace;
 const labels = [];
 
 async function init() {
+  console.time("findMatchTime");
+
   await loadFaceApiModels();
 
   let testFaceDescriptions = await getTestFaceDescriptions();
@@ -36,6 +38,8 @@ async function init() {
 
   let lookalikeResult = findLookalike(testFaceDescriptions, faceApiDescriptors);
   console.log(lookalikeResult);
+
+  console.timeEnd("findMatchTime");
 }
 
 async function loadFaceApiModels() {
