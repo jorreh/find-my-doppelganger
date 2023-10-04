@@ -50,9 +50,7 @@ async function loadFaceApiModels() {
 }
 
 function fillLables() {
-  // todo loop through /faces dir and make list that way
   for (let i = 1; i <= 101; i++) {
-    // todo -> change I terug naar 101
     labels.push(`face${i}`);
   }
 }
