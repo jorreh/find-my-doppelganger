@@ -21,24 +21,50 @@ const testFacesUrl = "http://127.0.0.1:5500/faces_test";
 
 const faceDescriptorsWritePath = "assets/faceDescriptors";
 
-//let res = await faceapi.loadFaceRecognitionModel(MODEL_URL); //model to Recognise Face
-await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
-await faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_URL);
-await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
-
 const testFaceName = "Jorre.jpg";
-const testFace = await canvas.loadImage(`${testFacesUrl}/${testFaceName}`); // todo - load from disk
 
-let testFaceDescriptions = await faceapi
-  .detectAllFaces(testFace)
-  .withFaceLandmarks()
-  .withFaceDescriptors();
-
-let testFaceDescription = testFaceDescriptions[0];
-
-testFaceDescriptions = faceapi.resizeResults(testFaceDescriptions, testFace);
+let testFace;
 
 const labels = [];
+
+async function init() {
+  await loadFaceApiModels();
+
+  let testFaceDescriptions = await getTestFaceDescriptions();
+
+  let faceApiDescriptors = getfaceDescriptorsFromJson();
+
+  //   fillLables();
+  //   let faceApiDescriptors = await generatefaceDescriptors();
+  //   console.log(faceApiDescriptors[0]);
+  //   writeLabeledFaceDescriptorsToJson(faceApiDescriptors);
+
+  let lookalikeResult = findLookalike(testFaceDescriptions, faceApiDescriptors);
+  console.log(lookalikeResult);
+}
+
+async function loadFaceApiModels() {
+  //let res = await faceapi.loadFaceRecognitionModel(MODEL_URL); //model to Recognise Face
+  await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
+  await faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_URL);
+  await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
+  return;
+}
+
+async function getTestFaceDescriptions() {
+  let testFace = await canvas.loadImage(`${testFacesUrl}/${testFaceName}`); // todo - load from disk
+
+  let testFaceDescriptions = await faceapi
+    .detectAllFaces(testFace)
+    .withFaceLandmarks()
+    .withFaceDescriptors();
+
+  // let testFaceDescription = testFaceDescriptions[0];
+
+  testFaceDescriptions = faceapi.resizeResults(testFaceDescriptions, testFace);
+
+  return testFaceDescriptions;
+}
 
 function fillLables() {
   // todo loop through /faces dir and make list that way
@@ -48,55 +74,67 @@ function fillLables() {
   }
 }
 
-fillLables();
-
 //const detections = await faceapi.detectAllFaces(img);
-
 // console.log(detections);
-
-/*
-const labeledFaceDescriptors = await Promise.all(
-  labels.map(async (label) => {
-    // const imgUrl = `images/${label}.jpeg`;
-    const imgUrl = `${facesUrl}/${label}.jpg`;
-    // const img = await faceapi.fetchImage(imgUrl);
-    const img = await canvas.loadImage(imgUrl);
-
-    const faceDescription = await faceapi
-      .detectSingleFace(img)
-      .withFaceLandmarks()
-      .withFaceDescriptor();
-
-    if (!faceDescription) {
-      throw new Error(`no faces detected for ${label}`);
-    }
-
-    let descriptorAsRegularArray = Array.from(faceDescription.descriptor);
-
-    const faceDescriptors = [descriptorAsRegularArray];
-
-    return {
-      label: label,
-      descriptors: faceDescriptors,
-    };
-    //return new faceapi.LabeledFaceDescriptors(label, faceDescriptors);
-  })
-);
-*/
-
-// writeJson(labeledFaceDescriptors, faceDescriptorsWritePath, "faceDescriptors");
 
 // let labeledFaceDescriptors = fs.readJsonSync(`${faceDescriptorsWritePath}/faceDescriptors.json`);
 // console.log(labeledFaceDescriptors);
 
-let labeledFaceDescriptors_raw = fs.readFileSync(
-  `${faceDescriptorsWritePath}/faceDescriptors.json`,
-  "utf8"
-);
+async function getlabeledFaceDescriptors() {
+  const labeledFaceDescriptors = await Promise.all(
+    labels.map(async (label) => {
+      // const imgUrl = `images/${label}.jpeg`;
+      const imgUrl = `${facesUrl}/${label}.jpg`;
+      // const img = await faceapi.fetchImage(imgUrl);
+      const img = await canvas.loadImage(imgUrl);
 
-let labeledFaceDescriptors = JSON.parse(labeledFaceDescriptors_raw);
+      const faceDescription = await faceapi
+        .detectSingleFace(img)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
-function generateFaceApiDescriptors(labeledFaceDescriptors) {
+      if (!faceDescription) {
+        throw new Error(`no faces detected for ${label}`);
+      }
+
+      let descriptorAsRegularArray = Array.from(faceDescription.descriptor);
+
+      const faceDescriptors = [descriptorAsRegularArray];
+
+      return {
+        label: label,
+        descriptors: faceDescriptors,
+      };
+      //return new faceapi.LabeledFaceDescriptors(label, faceDescriptors);
+    })
+  );
+
+  return labeledFaceDescriptors;
+}
+
+function writeLabeledFaceDescriptorsToJson(labeledFaceDescriptors) {
+  writeJson(labeledFaceDescriptors, faceDescriptorsWritePath, "faceDescriptors");
+}
+
+async function generatefaceDescriptors() {
+  let labeledFaceDescriptors = await getlabeledFaceDescriptors();
+  return labeledFaceDescriptors;
+}
+
+function loadLabeledFaceDescriptorsFromDisk() {
+  let labeledFaceDescriptors_raw = fs.readFileSync(
+    `${faceDescriptorsWritePath}/faceDescriptors.json`,
+    "utf8"
+  );
+
+  let labeledFaceDescriptors = JSON.parse(labeledFaceDescriptors_raw);
+
+  labeledFaceDescriptors = convertDescriptorsArrayToFloat32(labeledFaceDescriptors);
+
+  return labeledFaceDescriptors;
+}
+
+function convertFloatArrayDescriptorsToFaceApiDescriptors(labeledFaceDescriptors) {
   let faceApiDescriptors = [];
 
   for (let i = 0; i < labeledFaceDescriptors.length; i++) {
@@ -106,6 +144,16 @@ function generateFaceApiDescriptors(labeledFaceDescriptors) {
     );
     faceApiDescriptors.push(faceApiDescriptor);
   }
+
+  return faceApiDescriptors;
+}
+
+function getfaceDescriptorsFromJson() {
+  // plain parsed json faceDescriptors as array
+  let labeledFaceDescriptors = loadLabeledFaceDescriptorsFromDisk();
+
+  // convert to array of faceApi descriptors classes
+  let faceApiDescriptors = convertFloatArrayDescriptorsToFaceApiDescriptors(labeledFaceDescriptors);
 
   return faceApiDescriptors;
 }
@@ -122,18 +170,13 @@ function convertDescriptorsArrayToFloat32(originalArray) {
   return updatedArray;
 }
 
-labeledFaceDescriptors = convertDescriptorsArrayToFloat32(labeledFaceDescriptors);
-
-let faceApiDescriptors = generateFaceApiDescriptors(labeledFaceDescriptors);
-findLookalike(faceApiDescriptors);
-
-function findLookalike(faceApiDescriptors) {
+function findLookalike(testFaceDescriptions, faceApiDescriptors) {
   const threshold = 0.9;
   const faceMatcher = new faceapi.FaceMatcher(faceApiDescriptors, threshold);
 
   const results = testFaceDescriptions.map((fd) => faceMatcher.findBestMatch(fd.descriptor));
 
-  console.log(results);
+  return results;
 }
 
 function writeJson(json, jsonWritePath, fileName) {
@@ -144,3 +187,5 @@ function writeJson(json, jsonWritePath, fileName) {
 
   fs.writeFileSync(jsonWritePath + "/" + fileName + ".json", data, "utf-8");
 }
+
+init();
