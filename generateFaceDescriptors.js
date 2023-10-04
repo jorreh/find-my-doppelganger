@@ -10,6 +10,9 @@ import * as faceapi from "@vladmandic/face-api";
 import fetch from "node-fetch";
 
 import fs from "fs-extra";
+// const path = require("path");
+
+import * as path from "path";
 
 const MODEL_URL = "assets/models"; //model directory
 
@@ -19,15 +22,19 @@ faceapi.env.monkeyPatch({ fetch: fetch, Canvas, Image, ImageData });
 const facesUrl = "http://127.0.0.1:5500/faces";
 
 const faceDescriptorsWritePath = "assets/faceDescriptors";
+const facesPath = "assets/faces";
 
-const labels = [];
+let labels = [];
 
 async function init() {
   console.time("generateTime");
 
   await loadFaceApiModels();
 
-  fillLables();
+  // fillLables();
+
+  labels = getFaceImgListFromDisk(facesPath);
+
   let faceApiDescriptors = await generatefaceDescriptors();
   writeLabeledFaceDescriptorsToJson(faceApiDescriptors);
 
@@ -48,6 +55,27 @@ function fillLables() {
     // todo -> change I terug naar 101
     labels.push(`face${i}`);
   }
+}
+
+function getFaceImgListFromDisk(facesPath) {
+  const jpgFiles = [];
+
+  // Read the contents of the folder
+  const files = fs.readdirSync(facesPath);
+
+  // Loop through the files and filter for those with a .jpg extension
+  files.forEach((file) => {
+    const filePath = path.join(facesPath, file);
+
+    // Check if the file is a .jpg image
+    if (fs.statSync(filePath).isFile() && path.extname(file).toLowerCase() === ".jpg") {
+      // Remove the .jpg extension and add the file name to the array
+      const fileNameWithoutExtension = path.basename(file, ".jpg");
+      jpgFiles.push(fileNameWithoutExtension);
+    }
+  });
+
+  return jpgFiles;
 }
 
 async function getlabeledFaceDescriptors() {

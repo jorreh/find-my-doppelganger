@@ -15,6 +15,7 @@
     "@vladmandic/face-api": "1.7.12",
     "canvas": "2.11.2",
     "fs-extra": "11.1.1",
-    "node-fetch": "3.3.2"
+    "node-fetch": "3.3.2",
+    "path": "0.12.7"
   }
 }
