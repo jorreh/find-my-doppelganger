@@ -23,7 +23,7 @@ faceapi.env.monkeyPatch({ fetch: fetch, Canvas, Image, ImageData });
 // const facesUrl = "http://127.0.0.1:5500/faces";
 
 const faceDescriptorsWritePath = "assets/faceDescriptors";
-const facesPath = "assets/faces";
+const facesPath = "assets/faces_10k";
 
 let labels = [];
 
