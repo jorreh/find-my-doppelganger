@@ -22,6 +22,8 @@ const testFaceName = "Jorre.jpg";
 
 const faceDescriptorsWritePath = "assets/faceDescriptors";
 
+const threshold = 0.9;
+
 async function init() {
   console.time("findMatchTime");
 
@@ -31,7 +33,7 @@ async function init() {
 
   let faceApiDescriptors = getfaceDescriptorsFromJson();
 
-  let lookalikeResult = findLookalike(testFaceDescriptions, faceApiDescriptors);
+  let lookalikeResult = findLookalike(testFaceDescriptions, faceApiDescriptors, threshold);
   console.log(lookalikeResult);
 
   console.timeEnd("findMatchTime");
@@ -109,8 +111,7 @@ function convertDescriptorsArrayToFloat32(originalArray) {
   return updatedArray;
 }
 
-function findLookalike(testFaceDescriptions, faceApiDescriptors) {
-  const threshold = 0.9;
+function findLookalike(testFaceDescriptions, faceApiDescriptors, threshold) {
   const faceMatcher = new faceapi.FaceMatcher(faceApiDescriptors, threshold);
 
   const results = testFaceDescriptions.map((fd) => faceMatcher.findBestMatch(fd.descriptor));
