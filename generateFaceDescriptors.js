@@ -24,6 +24,7 @@ faceapi.env.monkeyPatch({ fetch: fetch, Canvas, Image, ImageData });
 
 const faceDescriptorsWritePath = "assets/faceDescriptors";
 const facesPath = "assets/faces_10k";
+// const facesPath = "assets/faces_100";
 
 let labels = [];
 
@@ -37,6 +38,9 @@ async function init() {
   // labels = labels.slice(1, 3); // tmp test with a slice of array
 
   let faceApiDescriptors = await getlabeledFaceDescriptors();
+
+  console.log("** done generating **");
+
   writeLabeledFaceDescriptorsToJson(faceApiDescriptors);
 
   console.timeEnd("generateTime");
@@ -79,7 +83,9 @@ function getFaceImgListFromDisk(facesPath) {
 
 async function getlabeledFaceDescriptors() {
   const labeledFaceDescriptors = await Promise.all(
-    labels.map(async (label) => {
+    labels.map(async (label, index) => {
+      console.log("n = " + index);
+
       //const imgUrl = `${facesUrl}/${label}.jpg`;
       const imgUrl = `${facesPath}/${label}.jpg`;
 
