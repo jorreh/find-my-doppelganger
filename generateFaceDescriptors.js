@@ -28,6 +28,9 @@ const facesPath = "assets/faces_10k";
 
 let labels = [];
 
+let sliceStart = 0;
+let sliceStop = 1000;
+
 async function init() {
   console.time("generateTime");
 
@@ -35,9 +38,9 @@ async function init() {
 
   labels = getFaceImgListFromDisk(facesPath);
 
-  // labels = labels.slice(1, 3); // tmp test with a slice of array
+  labels = labels.slice(sliceStart, sliceStop); // tmp test with a slice of array
 
-  let faceApiDescriptors = await generatelabeledFaceDescriptors();
+  let faceApiDescriptors = await generatelabeledFaceDescriptors(labels);
 
   console.log("** done generating **");
 
@@ -81,11 +84,9 @@ function getFaceImgListFromDisk(facesPath) {
   return jpgFiles;
 }
 
-async function generatelabeledFaceDescriptors() {
+async function generatelabeledFaceDescriptors(_labels) {
   const labeledFaceDescriptors = await Promise.all(
-    labels.map(async (label, index) => {
-      console.log("n = " + index);
-
+    _labels.map(async (label, index) => {
       //const imgUrl = `${facesUrl}/${label}.jpg`;
       const imgUrl = `${facesPath}/${label}.jpg`;
 
@@ -117,7 +118,38 @@ async function generatelabeledFaceDescriptors() {
 }
 
 function writeLabeledFaceDescriptorsToJson(labeledFaceDescriptors) {
-  writeJson(labeledFaceDescriptors, faceDescriptorsWritePath, "faceDescriptors");
+  let labeledFaceDescriptorsNew = [];
+
+  if (fs.existsSync(`${faceDescriptorsWritePath}/faceDescriptors.json`)) {
+    let labeledFaceDescriptorsJson = fs.readFileSync(
+      `${faceDescriptorsWritePath}/faceDescriptors.json`,
+      "utf8"
+    );
+
+    let labeledFaceDescriptorsJsonParsed = JSON.parse(labeledFaceDescriptorsJson);
+
+    labeledFaceDescriptorsNew = labeledFaceDescriptorsJsonParsed.concat(labeledFaceDescriptors);
+
+    labeledFaceDescriptorsNew = removeDuplicateLabels(labeledFaceDescriptorsNew);
+  } else {
+    labeledFaceDescriptorsNew = labeledFaceDescriptors;
+  }
+
+  writeJson(labeledFaceDescriptorsNew, faceDescriptorsWritePath, "faceDescriptors");
+}
+
+function removeDuplicateLabels(labeledFaceDescriptors) {
+  let uniqueLabels = {};
+
+  const filteredArray = labeledFaceDescriptors.filter((obj) => {
+    if (!uniqueLabels[obj.label]) {
+      uniqueLabels[obj.label] = true;
+      return true; // Keep the first occurrence of a label
+    }
+    return false; // Filter out subsequent occurrences
+  });
+
+  return filteredArray;
 }
 
 function writeJson(json, jsonWritePath, fileName) {
