@@ -28,8 +28,8 @@ const facesPath = "assets/faces_10k";
 
 let labels = [];
 
-let sliceStart = 0;
-let sliceStop = 1000;
+let sliceStart = 9000;
+let sliceStop = 9999;
 
 async function init() {
   console.time("generateTime");
@@ -100,6 +100,7 @@ async function generatelabeledFaceDescriptors(_labels) {
 
       if (!faceDescription) {
         throw new Error(`no faces detected for ${label}`);
+        //console.log(`no faces detected for ${label}`);
       }
 
       let descriptorAsRegularArray = Array.from(faceDescription.descriptor);
@@ -134,6 +135,8 @@ function writeLabeledFaceDescriptorsToJson(labeledFaceDescriptors) {
   } else {
     labeledFaceDescriptorsNew = labeledFaceDescriptors;
   }
+
+  console.log("json length: " + labeledFaceDescriptorsNew.length);
 
   writeJson(labeledFaceDescriptorsNew, faceDescriptorsWritePath, "faceDescriptors");
 }
