@@ -37,7 +37,7 @@ async function init() {
 
   // labels = labels.slice(1, 3); // tmp test with a slice of array
 
-  let faceApiDescriptors = await getlabeledFaceDescriptors();
+  let faceApiDescriptors = await generatelabeledFaceDescriptors();
 
   console.log("** done generating **");
 
@@ -81,7 +81,7 @@ function getFaceImgListFromDisk(facesPath) {
   return jpgFiles;
 }
 
-async function getlabeledFaceDescriptors() {
+async function generatelabeledFaceDescriptors() {
   const labeledFaceDescriptors = await Promise.all(
     labels.map(async (label, index) => {
       console.log("n = " + index);
