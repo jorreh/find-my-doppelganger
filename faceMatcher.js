@@ -44,6 +44,7 @@ async function loadFaceApiModels() {
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
   await faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_URL);
   await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
+  await faceapi.nets.ageGenderNet.loadFromDisk(MODEL_URL);
   return;
 }
 
@@ -53,7 +54,10 @@ async function getTestFaceDescriptions() {
   let testFaceDescriptions = await faceapi
     .detectAllFaces(testFace)
     .withFaceLandmarks()
+    .withAgeAndGender()
     .withFaceDescriptors();
+
+  console.log(testFaceDescriptions[0]);
 
   // let testFaceDescription = testFaceDescriptions[0];
 
