@@ -1,6 +1,6 @@
 ## About this script
 
-This face api is a script written in nodejs for the Crosscast Thispersondoesnotexist project. It uses the face-api node library in combination with tensorflow to find a matching face in a database of images.
+This project is written in nodejs. It uses the [face-api](https://github.com/vladmandic/face-api) node library in combination with tensorflow to find a matching face in a database of images.
 
 ## The two scripts
 
